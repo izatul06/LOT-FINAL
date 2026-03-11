@@ -12,229 +12,378 @@
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
         
         <style>
-            html, body, #map {
-                width: 100%; height: 100%; padding: 0; margin: 0;
-                font-family: 'Poppins', sans-serif;
-                background: #f4f7f6;
-            }
+            html, body, #map { width: 100%; height: 100%; padding: 0; margin: 0; font-family: 'Poppins', sans-serif; background: #2c3e50; overflow: hidden; }
 
-            /* --- NAVIGATION BAR GEMPAK --- */
+            /* Navigation Bar */
             .navbar {
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                height: 70px;
-                background: rgba(255, 255, 255, 0.85);
-                backdrop-filter: blur(12px); /* Kesan Blur Modern */
-                -webkit-backdrop-filter: blur(12px);
-                z-index: 2000;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                padding: 0 30px;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-                border-bottom: 2px solid #2ecc71;
+                position: absolute; top: 0; left: 0; right: 0; height: 70px;
+                background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px);
+                z-index: 2000; display: flex; align-items: center; justify-content: space-between;
+                padding: 0 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border-bottom: 3px solid #000066;
             }
+            .nav-brand { display: flex; align-items: center; gap: 15px; }
+            .menu-btn { font-size: 24px; cursor: pointer; color: #000066; padding: 10px; z-index: 3001; }
+            .web-logo { height: 50px; cursor: pointer; }
+            .brand-text h1 { margin:0; font-size:18px; color: #000066; }
+            .brand-text span { color:#cc0000; font-size:11px; font-weight:600; }
 
-            .nav-brand {
-                display: flex;
-                align-items: center;
-                gap: 15px;
+            /* Sidebar */
+            .sidebar {
+                position: fixed; top: 70px; left: -350px; width: 320px;
+                height: calc(100vh - 70px); background: #1a1f25; z-index: 3000;
+                transition: 0.4s; padding: 20px; color: white; overflow-y: auto;
+                box-shadow: 5px 0 15px rgba(0,0,0,0.5);
             }
-
-            .web-logo {
-                height: 50px;
-                transition: transform 0.3s;
-            }
+            .sidebar.active { left: 0; }
+            .sidebar h2 { font-size: 18px; color: #f1c40f; border-bottom: 1px solid #3e4f5f; padding-bottom: 10px; margin-bottom: 20px; }
+            .sidebar-section { background: rgba(255,255,255,0.05); padding: 15px; border-radius: 10px; margin-bottom: 15px; }
+            .sidebar-section label { display: block; font-size: 11px; color: #bdc3c7; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
             
-            .web-logo:hover { transform: scale(1.1); }
+            .dash-item { margin-bottom: 12px; }
+            .dash-label { color: #bdc3c7; font-weight: 300; display: block; font-size: 10px; text-transform: uppercase; }
+            .dash-value { color: #f1c40f; font-weight: 600; font-size: 14px; line-height: 1.4; display: block; }
 
-            .brand-text h1 {
-                margin: 0;
-                font-size: 18px;
-                color: #2c3e50;
-                text-transform: uppercase;
-                letter-spacing: 1px;
-            }
-            .brand-text span {
-                font-size: 11px;
-                color: #27ae60;
-                font-weight: 600;
+            /* Buttons & Inputs */
+            .map-toggle { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+            .map-btn { padding: 10px; border: none; border-radius: 6px; background: #34495e; color: white; cursor: pointer; font-weight: 600; font-size: 12px; transition: 0.3s; }
+            .map-btn.active { background: #000066; box-shadow: 0 0 10px rgba(0, 0, 102, 0.4); }
+            
+            .sidebar-input { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #455a64; background: #001117; color: white; box-sizing: border-box; margin-bottom: 10px; }
+            .btn-action { width: 100%; border: none; padding: 12px; border-radius: 6px; cursor: pointer; font-weight: 600; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; }
+            .btn-search { background: #000066; color: white; }
+            .btn-reset { background: #e74c3c; color: white; }
+            .btn-pdf { background: #cc0000; color: white; margin-top: 15px; }
+
+            /* Mini Map Styling */
+            .leaflet-control-minimap {
+                width: 180px; height: 150px; border: 3px solid white;
+                box-shadow: 0 0 15px rgba(0,0,0,0.3); border-radius: 10px;
+                background: white; margin-right: 15px !important; margin-bottom: 15px !important;
             }
 
-            .nav-menu {
-                display: flex;
-                gap: 20px;
-            }
-
-            .nav-item {
-                text-decoration: none;
-                color: #34495e;
-                font-size: 13px;
-                font-weight: 600;
-                padding: 8px 15px;
-                border-radius: 8px;
+            /* My Location Button Style */
+            .location-control {
+                background: white; width: 40px; height: 40px; border-radius: 10px;
+                display: flex; align-items: center; justify-content: center;
+                cursor: pointer; box-shadow: 0 0 15px rgba(0,0,0,0.2);
+                border: 2px solid #000066; color: #000066; font-size: 18px;
+                margin-right: 10px !important; margin-bottom: 15px !important;
                 transition: 0.3s;
-                display: flex;
-                align-items: center;
-                gap: 8px;
+            }
+            .location-control:hover { background: #000066; color: white; }
+            .location-control.loading { color: #e74c3c; animation: blink 1s infinite; }
+            @keyframes blink { 0% {opacity:1} 50% {opacity:0.3} 100% {opacity:1} }
+
+            /* Filter Buttons Style */
+            .filter-btn { width: 100%; padding: 10px; margin-top: 5px; border: none; border-radius: 5px; cursor: pointer; font-size: 11px; font-weight: 600; color: white; transition: 0.3s; }
+            .btn-large { background: #27ae60; }
+            .btn-small { background: #d35400; }
+            .filter-btn:hover { opacity: 0.8; transform: scale(0.98); }
+
+            #coord-display {
+                position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+                z-index: 2000; background: rgba(0,0,0,0.7); color: white;
+                padding: 5px 15px; border-radius: 20px; font-size: 12px; pointer-events: none;
             }
 
-            .nav-item:hover {
-                background: #2ecc71;
-                color: white;
-            }
+            .sidebar-overlay { display: none; position: fixed; top: 70px; left: 0; width: 100%; height: 100%; z-index: 2500; background: rgba(0,0,0,0.3); }
+            .sidebar-overlay.active { display: block; }
 
-            /* --- FLOATING STATS PANEL --- */
-            .stats-panel {
-                position: absolute;
-                bottom: 30px;
-                left: 20px;
-                z-index: 1000;
-                background: white;
-                padding: 15px;
-                border-radius: 12px;
-                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-                border-left: 5px solid #2ecc71;
-            }
+            #lot-info-container { display: none; }
 
-            /* --- POPUP STYLING --- */
-            .leaflet-popup-content-wrapper {
-                border-radius: 12px;
-                padding: 5px;
-            }
-            .popup-header {
-                background: #2ecc71;
-                color: white;
-                margin: -15px -15px 10px -15px;
-                padding: 10px;
-                border-radius: 10px 10px 0 0;
-                text-align: center;
-                font-weight: 600;
-            }
-
-            /* Adjust map position for navbar */
-            #map { margin-top: 0px; }
-            
-            /* Gempakkan Search Box */
-            .leaflet-control-search {
-                margin-top: 85px !important; /* Elak bertindih navbar */
-                border: 2px solid #2ecc71 !important;
-                border-radius: 10px !important;
+            @media print {
+                @page { size: A3 landscape; margin: 8mm; }
+                .navbar, .sidebar, .sidebar-overlay, .leaflet-control-zoom, .location-control, .filter-btn,
+                .leaflet-control-minimap, #coord-display, .leaflet-control-attribution { display: none !important; }
+                html, body { height: 100% !important; overflow: hidden !important; background: white !important; }
+                body.show-table #lot-info-container { display: block !important; border: 2px solid #000066; padding: 15px; border-radius: 12px; margin-bottom: 15px; width: 98%; }
+                #map { height: 94vh !important; width: 98% !important; border: 2px solid #000066 !important; margin: 0 auto !important; display: block !important; position: relative !important; }
+                body.show-table #map { height: 580px !important; }
+                #lot-info-container h1 { font-size: 22px !important; margin-bottom: 5px !important; }
+                #lot-info-container table td { padding: 8px !important; }
             }
         </style>
-        <title>GeoPortal Lot Tanah PUO</title>
+        <title>GeoPortal Perumahan Kesang</title>
     </head>
     <body>
 
         <nav class="navbar">
             <div class="nav-brand">
-                <img src="LOGOPOLI.png" alt="PUO Logo" class="web-logo">
+                <i class="fas fa-bars menu-btn" onclick="toggleSidebar()"></i>
+                <img src="LOGOPOLI.png" alt="Logo" class="web-logo" onclick="resetSearch()">
                 <div class="brand-text">
-                    <h1>GeoPortal Lot Tanah</h1>
-                    <span>POLITEKNIK UNGKU OMAR</span>
+                    <h1>Sistem Pemetaan Perumahan Digital (SPPD)</h1>
+                    <span>MUKIM KESANG, DAERAH TANGKAK, JOHOR</span>
                 </div>
             </div>
-            
-            <div class="nav-menu">
-                <a href="#" class="nav-item"><i class="fas fa-home"></i> Utama</a>
-                <a href="#" class="nav-item" onclick="map.setView([2.1037, 102.5223], 19)"><i class="fas fa-bullseye"></i> Fokus Lot</a>
-                <a href="#" class="nav-item" onclick="window.print()"><i class="fas fa-print"></i> Cetak Pelan</a>
+            <div onclick="preparePrint()" style="cursor:pointer; padding-right:20px; font-weight:600; color:#000066;">
+                <i class="fas fa-print"></i> CETAK PELAN DIGITAL A3
             </div>
         </nav>
 
-        <div class="stats-panel">
-            <div style="font-size: 10px; color: #7f8c8d;">STATUS SISTEM</div>
-            <div style="font-weight: 700; color: #2c3e50;"><i class="fas fa-check-circle" style="color: #2ecc71;"></i> GPS Aktif</div>
-            <div style="font-size: 11px; margin-top: 5px;">Sempadan: <span style="color: #e74c3c;">Tanda Merah</span></div>
+        <div class="sidebar-overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+        <div class="sidebar" id="sidebar">
+            <h2><i class="fas fa-layer-group"></i> PANEL KAWALAN</h2>
+            
+            <div id="dashboard-info" class="sidebar-section" style="display: none; border-left: 4px solid #f1c40f;">
+                <label>Maklumat Lot Dipilih</label>
+                <div class="dash-item"><span class="dash-label">NOMBOR LOT</span><span class="dash-value" id="dash-lot">-</span></div>
+                <div class="dash-item"><span class="dash-label">PEMILIK</span><span class="dash-value" id="dash-owner">-</span></div>
+                <div class="dash-item"><span class="dash-label">LUAS</span><span class="dash-value" id="dash-area">-</span></div>
+                <div id="gmaps-link-container"></div>
+            </div>
+
+            <div class="sidebar-section">
+                <label>Paparan Peta & Elemen</label>
+                <div class="map-toggle">
+                    <button class="map-btn" id="btn-street" onclick="changeBaseMap('street')">Street</button>
+                    <button class="map-btn active" id="btn-sat" onclick="changeBaseMap('sat')">Satellite</button>
+                </div>
+                <button class="map-btn active" id="btn-batu" style="width: 100%; margin-top: 8px;" onclick="toggleBatu()">
+                    <i class="fas fa-map-marker-alt"></i> Batu Sempadan: <span id="batu-status">ON</span>
+                </button>
+            </div>
+
+            <div class="sidebar-section">
+                <label>Carian No. Lot</label>
+                <input type="text" id="input-lot" class="sidebar-input" placeholder="Contoh: 1234...">
+                <button class="btn-action btn-search" onclick="searchLot()"><i class="fas fa-search"></i> Cari Sekarang</button>
+                <button class="btn-action btn-reset" onclick="resetSearch()"><i class="fas fa-sync-alt"></i> Set Semula</button>
+            </div>
+
+            <div class="sidebar-section">
+                <label>Analisis Data (Spatial Query)</label>
+                <button class="filter-btn btn-large" onclick="filterArea('besar')">
+                    <i class="fas fa-expand-arrows-alt"></i> Highlight Lot > 500 m²
+                </button>
+                <button class="filter-btn btn-small" onclick="filterArea('kecil')">
+                    <i class="fas fa-compress-arrows-alt"></i> Highlight Lot < 500 m²
+                </button>
+            </div>
+
+            <button class="btn-action btn-pdf" onclick="preparePrint()">
+                <i class="fas fa-file-pdf"></i> Jana Pelan Digital (PDF)
+            </button>
+        </div>
+
+        <div id="lot-info-container">
+            <div style="text-align:center; border-bottom:3px solid #000066; padding-bottom:10px; margin-bottom:15px;">
+                <h1 style="margin:0; font-family: 'Poppins', sans-serif; color: #000066;">LAPORAN PELAN DIGITAL LOT TANAH</h1>
+                <p style="margin:5px 0; color:#cc0000; font-weight:bold;">MUKIM KESANG, DAERAH TANGKAK, JOHOR</p>
+            </div>
+            <table style="width:100%; border-collapse:collapse; font-family: 'Poppins', sans-serif; font-size: 13px;">
+                <tr><td style="padding:10px; border:1px solid #ccc; background:#f9f9f9; width:25%;"><b>No. Lot</b></td><td style="padding:10px; border:1px solid #ccc;" id="res-lot">-</td></tr>
+                <tr><td style="padding:10px; border:1px solid #ccc; background:#f9f9f9;"><b>Pemilik Berdaftar</b></td><td style="padding:10px; border:1px solid #ccc;" id="res-owner">-</td></tr>
+                <tr><td style="padding:10px; border:1px solid #ccc; background:#f9f9f9;"><b>Keluasan Lot</b></td><td style="padding:10px; border:1px solid #ccc;" id="res-area">-</td></tr>
+                <tr><td style="padding:10px; border:1px solid #ccc; background:#f9f9f9;"><b>Tarikh Jana Laporan</b></td><td style="padding:10px; border:1px solid #ccc;" id="res-date">-</td></tr>
+            </table>
         </div>
 
         <div id="map"></div>
+        <div id="coord-display">Lat: 0.00000 | Lng: 0.00000</div>
 
-        <script src="js/qgis2web_expressions.js"></script>
         <script src="js/leaflet.js"></script>
-        <script src="js/L.Control.Layers.Tree.min.js"></script>
-        <script src="js/leaflet-hash.js"></script>
-        <script src="js/Autolinker.min.js"></script>
-        <script src="js/rbush.min.js"></script>
-        <script src="js/labelgun.min.js"></script>
-        <script src="js/labels.js"></script>
-        <script src="js/leaflet-search.js"></script>
-        
         <script src="data/LOTFINAL_0.js"></script>
         <script src="data/MERGETANDASEMPADAN_1.js"></script>
 
         <script>
-        var map = L.map('map', {
-            zoomControl:false, 
-            maxZoom:28, 
-            minZoom:1
-        }).fitBounds([[2.1030, 102.5210],[2.1044, 102.5235]]);
+        var homeView = [2.1037, 102.5222];
+        var map = L.map('map', { zoomControl:false, maxZoom:28, minZoom:1 }).setView(homeView, 19);
 
-        /* --- BASEMAPS --- */
-        var googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{
-            maxZoom: 20,
-            subdomains:['mt0','mt1','mt2','mt3'],
-            attribution: 'Google Satellite'
-        });
+        var googleSat = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{ maxZoom: 28, subdomains:['mt0','mt1','mt2','mt3'] });
+        var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 28 });
 
-        var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap'
-        }).addTo(map);
+        googleSat.addTo(map);
+        L.control.zoom({ position: 'topright' }).addTo(map);
 
-        /* --- ZOOM CONTROL POSITION --- */
-        L.control.zoom({ position: 'bottomright' }).addTo(map);
+        var selectedLayer = null;
 
-        /* --- POPUP CUSTOM --- */
-        function pop_LOT(feature, layer) {
-            var content = '<div class="popup-header">DETAIL LOT</div>' +
-                          '<table>' +
-                          '<tr><td><b>No Lot:</b></td><td>' + feature.properties['NO_LOT'] + '</td></tr>' +
-                          '<tr><td><b>Keluasan:</b></td><td>' + feature.properties['AREA'] + ' m²</td></tr>' +
-                          '</table>';
-            layer.bindPopup(content);
-        }
+        var layer_LOTFINAL_0 = L.geoJson(json_LOTFINAL_0, {
+            style: { color: '#ffffff', weight: 1.5, fillColor: '#2ecc71', fillOpacity: 0.5 },
+            onEachFeature: function(feature, layer) {
+                layer.bindTooltip("Lot: " + feature.properties['NO_LOT'], { sticky: true });
+                
+                var popupContent = `
+                    <div style="font-family: 'Poppins', sans-serif; padding: 5px; text-align:center;">
+                        <b style="color:#000066;">LOT: ${feature.properties.NO_LOT}</b><br>
+                        <span style="font-size:10px; color:#666;">Maklumat di Dashboard</span>
+                    </div>`;
+                layer.bindPopup(popupContent, { closeButton: false });
 
-        /* --- STYLE LOT --- */
-        var layer_LOTFINAL_0 = new L.geoJson(json_LOTFINAL_0, {
-            style: {
-                color: '#ffffff',
-                weight: 2,
-                fillColor: '#2ecc71',
-                fillOpacity: 0.5
-            },
-            onEachFeature: pop_LOT
-        }).addTo(map);
-
-        /* --- LAYER SEMPADAN --- */
-        var layer_MERGETANDASEMPADAN_1 = new L.geoJson(json_MERGETANDASEMPADAN_1, {
-            pointToLayer: function (feature, latlng) {
-                return L.circleMarker(latlng, {
-                    radius: 6,
-                    fillColor: "#e74c3c",
-                    color: "#fff",
-                    weight: 2,
-                    opacity: 1,
-                    fillOpacity: 0.9
+                layer.on({
+                    click: function(e) { 
+                        if (selectedLayer) { layer_LOTFINAL_0.resetStyle(selectedLayer); }
+                        selectedLayer = layer;
+                        layer.setStyle({ weight: 5, color: '#cc0000', fillColor: '#cc0000', fillOpacity: 0.4 });
+                        displayInfo(feature.properties); 
+                        map.fitBounds(layer.getBounds(), { padding: [40, 40], maxZoom: 21, animate: true }); 
+                        layer.openPopup();
+                        L.DomEvent.stopPropagation(e);
+                    }
                 });
             }
         }).addTo(map);
 
-        /* --- LAYER CONTROL --- */
-        var baseMaps = { "Peta Jalan": osm, "Satelit": googleSat };
-        var overlayMaps = { "Lot Tanah": layer_LOTFINAL_0, "Tanda Sempadan": layer_MERGETANDASEMPADAN_1 };
-        L.control.layers(baseMaps, overlayMaps, {collapsed: false, position: 'topright'}).addTo(map);
+        var layer_MERGETANDASEMPADAN_1 = L.geoJson(json_MERGETANDASEMPADAN_1, {
+            pointToLayer: function (feature, latlng) {
+                return L.circleMarker(latlng, { radius: 5, fillColor: "#e74c3c", color: "#fff", weight: 2, fillOpacity: 1 });
+            }
+        }).addTo(map);
 
-        /* --- SEARCH FUNCTION --- */
-        map.addControl(new L.Control.Search({
-            layer: layer_LOTFINAL_0,
-            propertyName: 'NO_LOT',
-            initial: false,
-            zoom: 19,
-            marker: false
-        }));
+        // --- MINI MAP & LOCATION BUTTON ---
+        var miniMapDiv = L.DomUtil.create('div', 'leaflet-control-minimap');
+        miniMapDiv.id = 'mini-map-id';
 
-        </script>         
+        var locBtnDiv = L.DomUtil.create('div', 'location-control');
+        locBtnDiv.innerHTML = '<i class="fas fa-location-arrow"></i>';
+        locBtnDiv.title = "Lokasi Saya";
+        locBtnDiv.onclick = function() {
+            locBtnDiv.classList.add('loading');
+            map.locate({setView: true, maxZoom: 19});
+        };
+
+        var CombinedControl = L.Control.extend({
+            options: { position: 'bottomright' },
+            onAdd: function() {
+                var container = L.DomUtil.create('div', 'combined-controls');
+                container.style.display = 'flex';
+                container.style.alignItems = 'flex-end';
+                container.appendChild(locBtnDiv);
+                container.appendChild(miniMapDiv);
+                return container;
+            }
+        });
+        map.addControl(new CombinedControl());
+
+        var miniMap = new L.Map('mini-map-id', { attributionControl: false, zoomControl: false, dragging: false, scrollWheelZoom: false });
+        L.tileLayer('http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+            subdomains: ['mt0','mt1','mt2','mt3'],
+            maxZoom: 22
+        }).addTo(miniMap);
+
+        L.geoJson(json_LOTFINAL_0, { style: { color: '#2ecc71', weight: 1, fillOpacity: 0.2, interactive: false } }).addTo(miniMap);
+
+        map.on('move', function() { miniMap.setView(map.getCenter(), Math.max(0, map.getZoom() - 2)); });
+        miniMap.setView(map.getCenter(), 17);
+
+        // Geolocation Logic
+        var locMarker, locCircle;
+        var miniLocMarker; // Variable untuk marker di mini map
+
+        map.on('locationfound', function(e) {
+            locBtnDiv.classList.remove('loading');
+            
+            // Marker pada peta utama
+            if (locMarker) { map.removeLayer(locMarker); map.removeLayer(locCircle); }
+            locCircle = L.circle(e.latlng, e.accuracy, {color: '#3388ff', fillOpacity: 0.1}).addTo(map);
+            locMarker = L.circleMarker(e.latlng, {radius: 8, fillColor: "#3388ff", color: "#fff", weight: 3, fillOpacity: 1}).addTo(map);
+            
+            // Marker pada mini map
+            if (miniLocMarker) { miniMap.removeLayer(miniLocMarker); }
+            miniLocMarker = L.circleMarker(e.latlng, {radius: 5, fillColor: "#3388ff", color: "#fff", weight: 2, fillOpacity: 1}).addTo(miniMap);
+            miniMap.setView(e.latlng, Math.max(0, map.getZoom() - 2));
+        });
+        
+        map.on('locationerror', function(e) {
+            locBtnDiv.classList.remove('loading');
+            alert("Gagal mengesan lokasi: " + e.message);
+        });
+
+        // FUNGSI FILTER AREA (UNTUK LAB GIS)
+        function filterArea(type) {
+            layer_LOTFINAL_0.eachLayer(function(layer) {
+                var area = parseFloat(layer.feature.properties.AREA || 0);
+                if (type === 'besar') {
+                    if (area > 500) { layer.setStyle({ fillColor: '#27ae60', fillOpacity: 0.8, color: '#fff', weight: 2 }); }
+                    else { layer.setStyle({ fillOpacity: 0.1, color: '#ccc', weight: 1 }); }
+                } else {
+                    if (area <= 500) { layer.setStyle({ fillColor: '#d35400', fillOpacity: 0.8, color: '#fff', weight: 2 }); }
+                    else { layer.setStyle({ fillOpacity: 0.1, color: '#ccc', weight: 1 }); }
+                }
+            });
+            map.fitBounds(layer_LOTFINAL_0.getBounds());
+        }
+
+        function displayInfo(props) {
+            document.getElementById('dashboard-info').style.display = 'block';
+            document.getElementById('dash-lot').innerText = props.NO_LOT || '-';
+            document.getElementById('dash-owner').innerText = props['tsp — pe'] || 'TIADA MAKLUMAT';
+            document.getElementById('dash-area').innerText = (props.AREA || '0') + " m²";
+
+            var lat = selectedLayer.getBounds().getCenter().lat;
+            var lng = selectedLayer.getBounds().getCenter().lng;
+            var gUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+            
+            document.getElementById('gmaps-link-container').innerHTML = 
+                `<a href="${gUrl}" target="_blank" class="btn-action" style="background:#4285F4; color:white; margin-top:10px;">
+                    <i class="fab fa-google"></i> Navigasi Lokasi
+                </a>`;
+
+            document.getElementById('res-lot').innerText = props.NO_LOT || '-';
+            document.getElementById('res-owner').innerText = props['tsp — pe'] || 'TIADA MAKLUMAT';
+            document.getElementById('res-area').innerText = (props.AREA || '0') + " m²";
+            document.getElementById('res-date').innerText = new Date().toLocaleString('ms-MY');
+
+            setTimeout(function() { map.closePopup(); }, 3000);
+        }
+
+        function toggleBatu() {
+            var btn = document.getElementById('btn-batu');
+            if (map.hasLayer(layer_MERGETANDASEMPADAN_1)) { 
+                map.removeLayer(layer_MERGETANDASEMPADAN_1); btn.classList.remove('active');
+                document.getElementById('batu-status').innerText = "OFF";
+            } else { 
+                map.addLayer(layer_MERGETANDASEMPADAN_1); btn.classList.add('active');
+                document.getElementById('batu-status').innerText = "ON";
+            }
+        }
+
+        function searchLot() {
+            var lotNo = document.getElementById('input-lot').value.trim();
+            var found = false;
+            layer_LOTFINAL_0.eachLayer(function(layer) {
+                if (layer.feature.properties.NO_LOT == lotNo) {
+                    layer.fire('click'); found = true;
+                }
+            });
+            if (!found) alert("No Lot " + lotNo + " tidak ditemui.");
+        }
+
+        function resetSearch() {
+            layer_LOTFINAL_0.resetStyle();
+            if (selectedLayer) { selectedLayer = null; }
+            document.getElementById('input-lot').value = '';
+            document.getElementById('dashboard-info').style.display = 'none';
+            document.body.classList.remove('show-table');
+            map.setView(homeView, 19);
+            map.closePopup();
+            if (locMarker) { map.removeLayer(locMarker); map.removeLayer(locCircle); }
+            if (miniLocMarker) { miniMap.removeLayer(miniLocMarker); } // Buang marker lokasi di mini map juga
+        }
+
+        function changeBaseMap(type) {
+            if (type === 'sat') { map.removeLayer(osm); googleSat.addTo(map); document.getElementById('btn-sat').classList.add('active'); document.getElementById('btn-street').classList.remove('active'); }
+            else { map.removeLayer(googleSat); osm.addTo(map); document.getElementById('btn-street').classList.add('active'); document.getElementById('btn-sat').classList.remove('active'); }
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        function preparePrint() {
+            document.getElementById('sidebar').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+            if (selectedLayer) { document.body.classList.add('show-table'); } 
+            else { document.body.classList.remove('show-table'); }
+            setTimeout(() => { window.print(); }, 1000);
+        }
+
+        map.on('mousemove', function(e) {
+            var coords = "Lat: " + e.latlng.lat.toFixed(5) + " | Lng: " + e.latlng.lng.toFixed(5);
+            document.getElementById('coord-display').innerHTML = coords;
+        });
+        </script>
     </body>
 </html>
